@@ -1,0 +1,13 @@
+name = "StatFEM_EUCLID"
+uuid = "20781104-c564-4627-b519-eb3b426232b6"
+authors = ["Jan Philipp Thiele <jan-philipp.thiele@tu-braunschweig.de> and contributors"]
+version = "1.0.0-DEV"
+
+[compat]
+julia = "1.10"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
