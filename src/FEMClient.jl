@@ -47,9 +47,8 @@ Keyword arguments:
 - `config`: Dict{String,Any} describing optional parameters for the fem_model
 """
 function evaluate_fem_model(fem_model::HTTPModel, parameter::Float64; solution_index = 1, config::Dict{String, Any} = empty_config())
-    return evaluate_fem_model(fem_model,[parameter],solution_index=solution_index,config=config)
+    return evaluate_fem_model(fem_model, [parameter], solution_index = solution_index, config = config)
 end
-
 
 
 """
@@ -60,13 +59,13 @@ Keyword arguments:
 - `solution_index`: For a vector valued unknown, return the unknown at this index (can be `:` for the full solution)
 - `config`: Dict{String,Any} describing optional parameters for the fem_model
 """
-function evaluate_fem_model(fem_model::HTTPModel, parameters::Vector{Float64}; solution_index = 1, config::Dict{String,Any} = empty_config())
-    eval_result = flatten_if_needed(evaluate(fem_model,[parameters],config))
+function evaluate_fem_model(fem_model::HTTPModel, parameters::Vector{Float64}; solution_index = 1, config::Dict{String, Any} = empty_config())
+    eval_result = flatten_if_needed(evaluate(fem_model, [parameters], config))
 
     if solution_index == Colon()
-        return Float64.(reduce(vcat,eval_result))
+        return Float64.(reduce(vcat, eval_result))
     end
     return Float64.(eval_result[solution_index])
-end 
+end
 
 end

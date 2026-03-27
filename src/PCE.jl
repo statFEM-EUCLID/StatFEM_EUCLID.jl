@@ -23,7 +23,7 @@ export compute_statistics
 
 Struct for holding the PCE surrogate
 """
-struct PolyChaosExpansion{T<: Real}
+struct PolyChaosExpansion{T <: Real}
     coefficients::AbstractMatrix{T}
     orthogonal_polynomials::AbstractCanonicalOrthoPoly
 end
@@ -39,11 +39,11 @@ with:
 - ``𝐗`` a random vector of distribution `vector_distribution`, default ``𝐗∼𝒩(0,1)``,
 - ``cᵢ`` the PCE coefficients to be calculated.
 """
-function PolyChaosExpansion(sample::UnivariateFEMSample{T};polynomials::AbstractCanonicalOrthoPoly = GaussOrthoPoly(8),vector_distribution::UnivariateDistribution=Normal(0,1)) where T<:Real
+function PolyChaosExpansion(sample::UnivariateFEMSample{T}; polynomials::AbstractCanonicalOrthoPoly = GaussOrthoPoly(8), vector_distribution::UnivariateDistribution = Normal(0, 1)) where {T <: Real}
     n = length(sample.uniform_sample)
-    @assert n >= 2 + 3 *(polynomials.deg+1) "Too few samples.\n Use at least (2 + 3 * (polynomial_degree + 1)) for numerical stability"
-    coeff = calculate_PCE_coefficients(quantile(vector_distribution,sample.uniform_sample),sample.fem_sample,polynomials)
-    return PolyChaosExpansion{T}(coeff,polynomials)
+    @assert n >= 2 + 3 * (polynomials.deg + 1) "Too few samples.\n Use at least (2 + 3 * (polynomial_degree + 1)) for numerical stability"
+    coeff = calculate_PCE_coefficients(quantile(vector_distribution, sample.uniform_sample), sample.fem_sample, polynomials)
+    return PolyChaosExpansion{T}(coeff, polynomials)
 end
 
 
@@ -52,7 +52,7 @@ end
 
 Calculate the coefficients of a polynomial chaos expansion based on measurements Y for parameters x
 """
-function calculate_PCE_coefficients(x::AbstractVector{T}, Y::AbstractMatrix{T}, orthopolys::AbstractCanonicalOrthoPoly) where T<:Real
+function calculate_PCE_coefficients(x::AbstractVector{T}, Y::AbstractMatrix{T}, orthopolys::AbstractCanonicalOrthoPoly) where {T <: Real}
     n = length(x)
     A = zeros(T, n, orthopolys.deg + 1)
     for i in eachindex(x)
@@ -66,7 +66,7 @@ end
 
 Compute mean values of the given PCE
 """
-function mean(pce::PolyChaosExpansion{T})::AbstractVector{T} where T<:Real
+function mean(pce::PolyChaosExpansion{T})::AbstractVector{T} where {T <: Real}
     return vec(pce.coefficients[1, :])
 end
 
@@ -76,9 +76,9 @@ end
 
 Compute variance of the given PCE
 """
-function var(pce::PolyChaosExpansion{T})::AbstractVector{T} where T <: Real
+function var(pce::PolyChaosExpansion{T})::AbstractVector{T} where {T <: Real}
     normsq = computeSP2(pce.orthogonal_polynomials)
-    result = zeros(T,size(pce.coefficients)[2])
+    result = zeros(T, size(pce.coefficients)[2])
     for i in eachindex(normsq)[2:end]
         result += (pce.coefficients[i, :] .^ 2 * normsq[i])
     end
@@ -90,9 +90,9 @@ end
 
 Compute covariance matrix of the given PCE
 """
-function covariance(pce::PolyChaosExpansion{T})::AbstractMatrix{T} where T <: Real
+function covariance(pce::PolyChaosExpansion{T})::AbstractMatrix{T} where {T <: Real}
     normsq = computeSP2(pce.orthogonal_polynomials)
-    result = zeros(T,size(pce.coefficients)[2], size(pce.coefficients)[2])
+    result = zeros(T, size(pce.coefficients)[2], size(pce.coefficients)[2])
     for i in eachindex(normsq)[2:end]
         result += pce.coefficients[i, :] * transpose(pce.coefficients[i, :]) * normsq[i]
     end
@@ -104,7 +104,7 @@ end
 
 Compute standard deviation of the given PCE
 """
-function std(pce::PolyChaosExpansion{T})::AbstractVector{T} where T <: Real
+function std(pce::PolyChaosExpansion{T})::AbstractVector{T} where {T <: Real}
     return sqrt.(var(pce))
 end
 
