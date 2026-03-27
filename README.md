@@ -1,3 +1,6 @@
+[![](https://img.shields.io/badge/docs-stable-blue.svg)](https://statfem-euclid.github.io/StatFEM_EUCLID.jl/stable/)
+[![](https://img.shields.io/badge/docs-dev-blue.svg)](https://statfem-euclid.github.io/StatFEM_EUCLID.jl/dev/)
+
 # StatFEM_EUCLID
 
 This package provides tooling for unsupervised constitutive model discovery based on statFEM an EUCLID.
