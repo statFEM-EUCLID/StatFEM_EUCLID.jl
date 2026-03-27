@@ -3,7 +3,7 @@
 
 # StatFEMEUCLID
 
-This package provides tooling for unsupervised constitutive model discovery based method statFEM-EUCLID[^1], which combines the statistical finite element method (statFEM)[^2] and EUCLID (Efficient Unsupervides Constitutive Law Identification and Discovery)[^3].
+This package provides tooling for statFEM-EUCLID[^1], which combines the statistical finite element method (statFEM)[^2] and EUCLID (Efficient Unsupervides Constitutive Law Identification and Discovery)[^3] for unsupervised constitutive model discovery.
 Instead of 'hard-wiring' a single finite element software, the package is able to use any solver as a black box
 through a [UM-Bridge](https://um-bridge-benchmarks.readthedocs.io/en/docs/) interface.
 
