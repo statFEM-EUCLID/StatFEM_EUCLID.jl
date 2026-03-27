@@ -54,7 +54,7 @@ The figures show:
 
 module Example101_Sampling1DBarUnderTension
 
-using StatFEM_EUCLID
+using StatFEMEUCLID
 using Random
 using Distributions
 using UMBridge
@@ -90,16 +90,16 @@ function main(;
 
     # Now we perform sampling of the black box through the `Sampling` submodule
 
-    sample_MC = StatFEM_EUCLID.Sampling.sample_FEM(fem_model, n_MonteCarlo, sample_distribution = lognormal_dist, rng = rng)
-    sample_PCE = StatFEM_EUCLID.Sampling.sample_FEM(fem_model, n_PCE, sample_distribution = lognormal_dist, rng = rng)
+    sample_MC = StatFEMEUCLID.Sampling.sample_FEM(fem_model, n_MonteCarlo, sample_distribution = lognormal_dist, rng = rng)
+    sample_PCE = StatFEMEUCLID.Sampling.sample_FEM(fem_model, n_PCE, sample_distribution = lognormal_dist, rng = rng)
 
     # For the Monto Carlo sample we directly compute the empirical standard deviation
-    _, σ_MC = StatFEM_EUCLID.Sampling.compute_statistics(sample_MC)
+    _, σ_MC = StatFEMEUCLID.Sampling.compute_statistics(sample_MC)
 
     # With the other (smaller!) sample we use the `PCE` submodule to create a surrogate
     # and calculate it's mean and standard deviation.
-    pce_surrogate = StatFEM_EUCLID.PCE.PolyChaosExpansion(sample_PCE)
-    μ_PCE, σ_PCE = StatFEM_EUCLID.PCE.compute_statistics(pce_surrogate)
+    pce_surrogate = StatFEMEUCLID.PCE.PolyChaosExpansion(sample_PCE)
+    μ_PCE, σ_PCE = StatFEMEUCLID.PCE.compute_statistics(pce_surrogate)
 
     return plot_variations(μ_PCE, σ_PCE, sample_MC, gridpoint_index)
 end
