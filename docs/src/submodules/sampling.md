@@ -1,7 +1,7 @@
 # Sampling
 
 ```@meta
-CurrentModule = StatFEM_EUCLID.Sampling
+CurrentModule = StatFEMEUCLID.Sampling
 ```
 ## Module description
 

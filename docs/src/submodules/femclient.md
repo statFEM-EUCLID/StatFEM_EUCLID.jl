@@ -1,7 +1,7 @@
 # FEMClient
 
 ```@meta
-CurrentModule = StatFEM_EUCLID.FEMClient
+CurrentModule = StatFEMEUCLID.FEMClient
 ```
 ## Module description
 

@@ -1,6 +1,6 @@
-using StatFEM_EUCLID
+using StatFEMEUCLID
 using Test
 
-@testset "StatFEM_EUCLID.jl" begin
+@testset "StatFEMEUCLID.jl" begin
     # Write your tests here.
 end

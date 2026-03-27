@@ -2,7 +2,7 @@ push!(LOAD_PATH, "../src/")
 
 using Documenter
 using ExampleJuggler
-using StatFEM_EUCLID
+using StatFEMEUCLID
 using CairoMakie
 
 
@@ -23,10 +23,10 @@ function make_all(; with_examples::Bool = false, modules = :all, run_examples::B
     end
 
     makedocs(
-        modules = [StatFEM_EUCLID, StatFEM_EUCLID.FEMClient, StatFEM_EUCLID.Sampling, StatFEM_EUCLID.PCE],
-        sitename = "StatFEM_EUCLID.jl",
+        modules = [StatFEMEUCLID, StatFEMEUCLID.FEMClient, StatFEMEUCLID.Sampling, StatFEMEUCLID.PCE],
+        sitename = "StatFEMEUCLID.jl",
         authors = "Jan Philipp Thiele, Andrea Morini",
-        format = Documenter.HTML(; repolink = "https://github.com/statFEM-EUCLID/StatFEM_EUCLID.jl", mathengine = MathJax3()),
+        format = Documenter.HTML(; repolink = "https://github.com/statFEM-EUCLID/StatFEMEUCLID.jl", mathengine = MathJax3()),
         clean = false,
         checkdocs = :none,
         warnonly = false,
@@ -48,5 +48,5 @@ end
 make_all(; with_examples = true)
 
 deploydocs(
-    repo = "github.com/statFEM-EUCLID/StatFEM_EUCLID.jl/"
+    repo = "github.com/statFEM-EUCLID/StatFEMEUCLID.jl/"
 )

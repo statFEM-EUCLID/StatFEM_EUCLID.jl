@@ -1,7 +1,7 @@
-[![](https://img.shields.io/badge/docs-stable-blue.svg)](https://statfem-euclid.github.io/StatFEM_EUCLID.jl/stable/)
-[![](https://img.shields.io/badge/docs-dev-blue.svg)](https://statfem-euclid.github.io/StatFEM_EUCLID.jl/dev/)
+[![](https://img.shields.io/badge/docs-stable-blue.svg)](https://statfem-euclid.github.io/StatFEMEUCLID.jl/stable/)
+[![](https://img.shields.io/badge/docs-dev-blue.svg)](https://statfem-euclid.github.io/StatFEMEUCLID.jl/dev/)
 
-# StatFEM_EUCLID
+# StatFEMEUCLID
 
 This package provides tooling for unsupervised constitutive model discovery based on statFEM an EUCLID.
 Instead of 'hard-wiring' a single finite element software, the package is able to use any solver as a black box
@@ -15,4 +15,4 @@ through a [UM-Bridge](https://um-bridge-benchmarks.readthedocs.io/en/docs/) inte
 
 
 ## License
-StatFEM_EUCLID.jl is licensed under the MIT License. 
+StatFEMEUCLID.jl is licensed under the MIT License. 

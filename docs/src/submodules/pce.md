@@ -1,7 +1,7 @@
 # PCE
 
 ```@meta
-CurrentModule = StatFEM_EUCLID.PCE
+CurrentModule = StatFEMEUCLID.PCE
 ```
 
 ```@docs
