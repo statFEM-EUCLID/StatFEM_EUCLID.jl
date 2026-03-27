@@ -1,1 +1,4 @@
 /Manifest*.toml
+/build
+/docs/build
+/docs/src/module_examples
