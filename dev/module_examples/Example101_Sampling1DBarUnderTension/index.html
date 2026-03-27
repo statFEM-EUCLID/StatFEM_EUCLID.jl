@@ -22,18 +22,18 @@ end</code></pre><p>With <code>server_url</code> you can point to a different UMB
         gridpoint_index = 50,
     )
 
-    rng = MersenneTwister(2020); #fixed seed for comparability between runs
+    rng = MersenneTwister(2020)  #fixed seed for comparability between runs
 
     fem_model = UMBridge.HTTPModel(&quot;Bar1D.FEM&quot;, server_url)
-    lognormal_dist = create_lognormal_distribution(μ_E, σ_E)</code></pre><p>Now we perform sampling of the black box through the <code>Sampling</code> submodule</p><pre><code class="language-julia hljs">    sample_MC = StatFEM_EUCLID.Sampling.sample_FEM(fem_model, n_MonteCarlo, sample_distribution = lognormal_dist,rng=rng)
-    sample_PCE = StatFEM_EUCLID.Sampling.sample_FEM(fem_model, n_PCE, sample_distribution = lognormal_dist,rng=rng)</code></pre><p>For the Monto Carlo sample we directly compute the empirical standard deviation</p><pre><code class="language-julia hljs">    _, σ_MC = StatFEM_EUCLID.Sampling.compute_statistics(sample_MC)</code></pre><p>With the other (smaller!) sample we use the <code>PCE</code> submodule to create a surrogate and calculate it&#39;s mean and standard deviation.</p><pre><code class="language-julia hljs">    pce_surrogate = StatFEM_EUCLID.PCE.PolyChaosExpansion(sample_PCE)
+    lognormal_dist = create_lognormal_distribution(μ_E, σ_E)</code></pre><p>Now we perform sampling of the black box through the <code>Sampling</code> submodule</p><pre><code class="language-julia hljs">    sample_MC = StatFEM_EUCLID.Sampling.sample_FEM(fem_model, n_MonteCarlo, sample_distribution = lognormal_dist, rng = rng)
+    sample_PCE = StatFEM_EUCLID.Sampling.sample_FEM(fem_model, n_PCE, sample_distribution = lognormal_dist, rng = rng)</code></pre><p>For the Monto Carlo sample we directly compute the empirical standard deviation</p><pre><code class="language-julia hljs">    _, σ_MC = StatFEM_EUCLID.Sampling.compute_statistics(sample_MC)</code></pre><p>With the other (smaller!) sample we use the <code>PCE</code> submodule to create a surrogate and calculate it&#39;s mean and standard deviation.</p><pre><code class="language-julia hljs">    pce_surrogate = StatFEM_EUCLID.PCE.PolyChaosExpansion(sample_PCE)
     μ_PCE, σ_PCE = StatFEM_EUCLID.PCE.compute_statistics(pce_surrogate)
 
-    return plot_variations(μ_PCE,σ_PCE,sample_MC,gridpoint_index)
-end</code></pre><p>This function generates all the plots shown above based on the PCE surrogate and the Monte Carlo sample</p><pre><code class="language-julia hljs">function plot_variations(μ_PCE,σ_PCE,sample_MC,gridpoint_index)
+    return plot_variations(μ_PCE, σ_PCE, sample_MC, gridpoint_index)
+end</code></pre><p>This function generates all the plots shown above based on the PCE surrogate and the Monte Carlo sample</p><pre><code class="language-julia hljs">function plot_variations(μ_PCE, σ_PCE, sample_MC, gridpoint_index)
 
-    MC_sample_at_gridpoint = sample_MC.fem_sample[:,gridpoint_index]
-    f = Figure(size=(800,800))</code></pre><p>Data for the first plot: confidence interval of the bar displacement</p><pre><code class="language-julia hljs">    xgrid = LinRange(0,100,50)
+    MC_sample_at_gridpoint = sample_MC.fem_sample[:, gridpoint_index]
+    f = Figure(size = (800, 800))</code></pre><p>Data for the first plot: confidence interval of the bar displacement</p><pre><code class="language-julia hljs">    xgrid = LinRange(0, 100, 50)
     confidence_factor_95p = 1.96
     lower_percentile = μ_PCE - confidence_factor_95p * σ_PCE
     upper_percentile = μ_PCE + confidence_factor_95p * σ_PCE
@@ -41,32 +41,32 @@ end</code></pre><p>This function generates all the plots shown above based on th
     #Data for the other plots,
     #i.e. related to the displacement at the tip of the bar
 
-	x_L = Vector(LinRange(minimum(MC_sample_at_gridpoint),maximum(MC_sample_at_gridpoint),100))
-	PCE_distribution = Normal(μ_PCE[gridpoint_index],σ_PCE[gridpoint_index])
+    x_L = Vector(LinRange(minimum(MC_sample_at_gridpoint), maximum(MC_sample_at_gridpoint), 100))
+    PCE_distribution = Normal(μ_PCE[gridpoint_index], σ_PCE[gridpoint_index])
 
-	#Axes with labels
-	ax11 = Axis(f[1,1],xlabel =L&quot;X^h&quot;,ylabel = L&quot;u^h(X^h)&quot;)
-	ax12 = Axis(f[1,2],xlabel =L&quot;u^h(L)&quot;,ylabel = L&quot;f(u^h(L))&quot;)
-	ax21 = Axis(f[2,1],xlabel =L&quot;u^h(L)&quot;,ylabel = L&quot;F(u^h(L))&quot;)
-	ax22 = Axis(f[2,2],xlabel =L&quot;u^h(L)&quot;,ylabel = L&quot;f(u^h(L))&quot;)
+    #Axes with labels
+    ax11 = Axis(f[1, 1], xlabel = L&quot;X^h&quot;, ylabel = L&quot;u^h(X^h)&quot;)
+    ax12 = Axis(f[1, 2], xlabel = L&quot;u^h(L)&quot;, ylabel = L&quot;f(u^h(L))&quot;)
+    ax21 = Axis(f[2, 1], xlabel = L&quot;u^h(L)&quot;, ylabel = L&quot;F(u^h(L))&quot;)
+    ax22 = Axis(f[2, 2], xlabel = L&quot;u^h(L)&quot;, ylabel = L&quot;f(u^h(L))&quot;)
 
-	band!(f[1,1],xgrid,lower_percentile,upper_percentile; label = &quot;95% CI&quot;)
-	lines!(f[1,1],xgrid,μ_PCE;color=:black, label= &quot;μ_PCE&quot;)
+    band!(f[1, 1], xgrid, lower_percentile, upper_percentile; label = &quot;95% CI&quot;)
+    lines!(f[1, 1], xgrid, μ_PCE; color = :black, label = &quot;μ_PCE&quot;)
 
-	hist!(f[1,2],MC_sample_at_gridpoint,bins=50,normalization=:pdf;label=&quot;Hist.&quot;)
-	lines!(f[1,2],x_L, pdf.(PCE_distribution,x_L), color=:gold2;label=&quot;PDF&quot;)
+    hist!(f[1, 2], MC_sample_at_gridpoint, bins = 50, normalization = :pdf; label = &quot;Hist.&quot;)
+    lines!(f[1, 2], x_L, pdf.(PCE_distribution, x_L), color = :gold2; label = &quot;PDF&quot;)
 
-	ecdfplot!(f[2,1],MC_sample_at_gridpoint;label=&quot;MC&quot;)
-	lines!(f[2,1],x_L,cdf.(PCE_distribution,x_L),color=:gold2;label=&quot;PCE&quot;)
+    ecdfplot!(f[2, 1], MC_sample_at_gridpoint; label = &quot;MC&quot;)
+    lines!(f[2, 1], x_L, cdf.(PCE_distribution, x_L), color = :gold2; label = &quot;PCE&quot;)
 
-	density!(f[2,2],MC_sample_at_gridpoint;label=&quot;MC&quot;)
-	lines!(f[2,2],x_L, pdf.(PCE_distribution,x_L), color=:gold2;label=&quot;PCE&quot;)
+    density!(f[2, 2], MC_sample_at_gridpoint; label = &quot;MC&quot;)
+    lines!(f[2, 2], x_L, pdf.(PCE_distribution, x_L), color = :gold2; label = &quot;PCE&quot;)
 
-	axislegend(ax11, position = :rb)
-	axislegend(ax12, position = :rt)
-	axislegend(ax21, position = :rb)
-	axislegend(ax22, position = :rt)
+    axislegend(ax11, position = :rb)
+    axislegend(ax12, position = :rt)
+    axislegend(ax21, position = :rb)
+    axislegend(ax22, position = :rt)
     return f
 end
 
-end</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p><section class="footnotes is-size-7"><ul><li class="footnote" id="footnote-Narouie23"><a class="tag is-link" href="#citeref-Narouie23">Narouie23</a><div class="admonition is-category-reference" id="Reference-f9b63ce213827e14"><header class="admonition-header">Reference<a class="admonition-anchor" href="#Reference-f9b63ce213827e14" title="Permalink"></a></header><div class="admonition-body"><p>&quot;Inferring Displacements from Sparse Measurements Using the Statistical Finite Element Method&quot;,<br/>V. Narouie, H. Wessels, U. Römer,<br/>Mechanical Systems and Signal Processing (2023),<br/><a href="https://doi.org/10.1016/j.ymssp.2023.110574">&gt;Journal-Link&lt;</a></p></div></div></li></ul></section></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../submodules/pce/">« PCE</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Friday 27 March 2026 16:56">Friday 27 March 2026</span>. Using Julia version 1.12.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+end</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p><section class="footnotes is-size-7"><ul><li class="footnote" id="footnote-Narouie23"><a class="tag is-link" href="#citeref-Narouie23">Narouie23</a><div class="admonition is-category-reference" id="Reference-f9b63ce213827e14"><header class="admonition-header">Reference<a class="admonition-anchor" href="#Reference-f9b63ce213827e14" title="Permalink"></a></header><div class="admonition-body"><p>&quot;Inferring Displacements from Sparse Measurements Using the Statistical Finite Element Method&quot;,<br/>V. Narouie, H. Wessels, U. Römer,<br/>Mechanical Systems and Signal Processing (2023),<br/><a href="https://doi.org/10.1016/j.ymssp.2023.110574">&gt;Journal-Link&lt;</a></p></div></div></li></ul></section></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../submodules/pce/">« PCE</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Friday 27 March 2026 17:17">Friday 27 March 2026</span>. Using Julia version 1.12.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

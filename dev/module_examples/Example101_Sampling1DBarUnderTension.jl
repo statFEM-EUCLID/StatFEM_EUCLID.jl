@@ -1,4 +1,4 @@
-# Copyright (c) 2025-2026 Jan Philipp Thiele 
+# Copyright (c) 2025-2026 Jan Philipp Thiele
 # SPDX-License-Identifier: MIT
 
 #=
@@ -82,69 +82,69 @@ function main(;
         server_url = "http://localhost:4343",
         gridpoint_index = 50,
     )
-    
-    rng = MersenneTwister(2020); #fixed seed for comparability between runs
+
+    rng = MersenneTwister(2020)  #fixed seed for comparability between runs
 
     fem_model = UMBridge.HTTPModel("Bar1D.FEM", server_url)
     lognormal_dist = create_lognormal_distribution(μ_E, σ_E)
 
     # Now we perform sampling of the black box through the `Sampling` submodule
 
-    sample_MC = StatFEM_EUCLID.Sampling.sample_FEM(fem_model, n_MonteCarlo, sample_distribution = lognormal_dist,rng=rng)
-    sample_PCE = StatFEM_EUCLID.Sampling.sample_FEM(fem_model, n_PCE, sample_distribution = lognormal_dist,rng=rng)
+    sample_MC = StatFEM_EUCLID.Sampling.sample_FEM(fem_model, n_MonteCarlo, sample_distribution = lognormal_dist, rng = rng)
+    sample_PCE = StatFEM_EUCLID.Sampling.sample_FEM(fem_model, n_PCE, sample_distribution = lognormal_dist, rng = rng)
 
     # For the Monto Carlo sample we directly compute the empirical standard deviation
     _, σ_MC = StatFEM_EUCLID.Sampling.compute_statistics(sample_MC)
 
-    # With the other (smaller!) sample we use the `PCE` submodule to create a surrogate 
+    # With the other (smaller!) sample we use the `PCE` submodule to create a surrogate
     # and calculate it's mean and standard deviation.
     pce_surrogate = StatFEM_EUCLID.PCE.PolyChaosExpansion(sample_PCE)
     μ_PCE, σ_PCE = StatFEM_EUCLID.PCE.compute_statistics(pce_surrogate)
 
-    return plot_variations(μ_PCE,σ_PCE,sample_MC,gridpoint_index)
+    return plot_variations(μ_PCE, σ_PCE, sample_MC, gridpoint_index)
 end
 
 # This function generates all the plots shown above based on the PCE surrogate and the Monte Carlo sample
 
-function plot_variations(μ_PCE,σ_PCE,sample_MC,gridpoint_index)
+function plot_variations(μ_PCE, σ_PCE, sample_MC, gridpoint_index)
 
-    MC_sample_at_gridpoint = sample_MC.fem_sample[:,gridpoint_index]
-    f = Figure(size=(800,800))
+    MC_sample_at_gridpoint = sample_MC.fem_sample[:, gridpoint_index]
+    f = Figure(size = (800, 800))
 
     # Data for the first plot: confidence interval of the bar displacement
-    xgrid = LinRange(0,100,50)
+    xgrid = LinRange(0, 100, 50)
     confidence_factor_95p = 1.96
     lower_percentile = μ_PCE - confidence_factor_95p * σ_PCE
     upper_percentile = μ_PCE + confidence_factor_95p * σ_PCE
 
     #Data for the other plots,
     #i.e. related to the displacement at the tip of the bar
-	
-	x_L = Vector(LinRange(minimum(MC_sample_at_gridpoint),maximum(MC_sample_at_gridpoint),100))
-	PCE_distribution = Normal(μ_PCE[gridpoint_index],σ_PCE[gridpoint_index])
 
-	#Axes with labels
-	ax11 = Axis(f[1,1],xlabel =L"X^h",ylabel = L"u^h(X^h)")
-	ax12 = Axis(f[1,2],xlabel =L"u^h(L)",ylabel = L"f(u^h(L))")
-	ax21 = Axis(f[2,1],xlabel =L"u^h(L)",ylabel = L"F(u^h(L))")
-	ax22 = Axis(f[2,2],xlabel =L"u^h(L)",ylabel = L"f(u^h(L))")
+    x_L = Vector(LinRange(minimum(MC_sample_at_gridpoint), maximum(MC_sample_at_gridpoint), 100))
+    PCE_distribution = Normal(μ_PCE[gridpoint_index], σ_PCE[gridpoint_index])
 
-	band!(f[1,1],xgrid,lower_percentile,upper_percentile; label = "95% CI")
-	lines!(f[1,1],xgrid,μ_PCE;color=:black, label= "μ_PCE")
+    #Axes with labels
+    ax11 = Axis(f[1, 1], xlabel = L"X^h", ylabel = L"u^h(X^h)")
+    ax12 = Axis(f[1, 2], xlabel = L"u^h(L)", ylabel = L"f(u^h(L))")
+    ax21 = Axis(f[2, 1], xlabel = L"u^h(L)", ylabel = L"F(u^h(L))")
+    ax22 = Axis(f[2, 2], xlabel = L"u^h(L)", ylabel = L"f(u^h(L))")
 
-	hist!(f[1,2],MC_sample_at_gridpoint,bins=50,normalization=:pdf;label="Hist.")
-	lines!(f[1,2],x_L, pdf.(PCE_distribution,x_L), color=:gold2;label="PDF")
-	
-	ecdfplot!(f[2,1],MC_sample_at_gridpoint;label="MC")
-	lines!(f[2,1],x_L,cdf.(PCE_distribution,x_L),color=:gold2;label="PCE")
-	
-	density!(f[2,2],MC_sample_at_gridpoint;label="MC")
-	lines!(f[2,2],x_L, pdf.(PCE_distribution,x_L), color=:gold2;label="PCE")
-	
-	axislegend(ax11, position = :rb)
-	axislegend(ax12, position = :rt)
-	axislegend(ax21, position = :rb)
-	axislegend(ax22, position = :rt)
+    band!(f[1, 1], xgrid, lower_percentile, upper_percentile; label = "95% CI")
+    lines!(f[1, 1], xgrid, μ_PCE; color = :black, label = "μ_PCE")
+
+    hist!(f[1, 2], MC_sample_at_gridpoint, bins = 50, normalization = :pdf; label = "Hist.")
+    lines!(f[1, 2], x_L, pdf.(PCE_distribution, x_L), color = :gold2; label = "PDF")
+
+    ecdfplot!(f[2, 1], MC_sample_at_gridpoint; label = "MC")
+    lines!(f[2, 1], x_L, cdf.(PCE_distribution, x_L), color = :gold2; label = "PCE")
+
+    density!(f[2, 2], MC_sample_at_gridpoint; label = "MC")
+    lines!(f[2, 2], x_L, pdf.(PCE_distribution, x_L), color = :gold2; label = "PCE")
+
+    axislegend(ax11, position = :rb)
+    axislegend(ax12, position = :rt)
+    axislegend(ax21, position = :rb)
+    axislegend(ax22, position = :rt)
     return f
 end
 
